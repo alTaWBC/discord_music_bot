@@ -2,34 +2,48 @@ import os
 import discord
 from dotenv import load_dotenv
 
+from discord.ext import commands
 load_dotenv()
 
 intents = discord.Intents.default()
 intents.members = True
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='.', intents=intents)
+
+
 TOKEN = os.getenv('DISCORD_TOKEN')
 NAME = os.getenv('NAME')
 
 
-@client.event
-async def on_ready():
-    guild = discord.utils.find(lambda g: g.name == NAME, client.guilds)
-    print(guild.name)
-    members = '\n - '.join([member.name for member in guild.members])
-    print(f'Guild Members:\n - {members}')
-
-    # for member in guild.members:
-    #     if member.name == 'Ryzon' or member.name == 'Kanelao':
-    #         await member.create_dm()
-    #         await member.dm_channel.send(f'WTF {member.name}??? Que andas a fazer da vida????')
+@bot.command(name='test', help='Responds with a Test Message')
+async def msg(channel):
+    await channel.send('Hello Manel')
 
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    await message.channel.send('Hello Manel')
+@bot.command(name='m', help='Spams Fucking Miguel')
+async def fucking_miguel(channel, number_of_times: int):
+    for _ in range(number_of_times):
+        await channel.send('Fucking Miguel')
 
 
-client.run(TOKEN)
+@bot.command(name='p', help='Plays Music from the given url')
+async def play(channel, url: str):
+
+    channel_name = channel.message.author.voice.channel.name
+    voice_channel = discord.utils.get(
+        channel.guild.voice_channels, name=channel_name)
+    voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+
+    if voice_client == None:
+        await voice_channel.connect()
+    else:
+        await voice_client.move_to(channel_name)
+
+
+@bot.command(name='l', help='Stops Music bot')
+async def leave(channel):
+
+    for voice_channel in bot.voice_clients:
+        if voice_channel.guild == channel.guild:
+            await voice_channel.disconnect()
+
+bot.run(TOKEN)
