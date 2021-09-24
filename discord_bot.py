@@ -46,4 +46,27 @@ async def leave(channel):
         if voice_channel.guild == channel.guild:
             await voice_channel.disconnect()
 
+
+@bot.command(name='pa', help='Pauses Music bot')
+async def pause(channel):
+    voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+    if voice_client.is_playing():
+        voice_client.pause()
+    else:
+        await channel.send('Nothing is Playing Manel')
+
+
+@bot.command(name='r', help='Resumes Music bot')
+async def resume(channel):
+    voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+    if voice_client.is_paused():
+        voice_client.resume()
+    else:
+        await channel.send("It's already playing Manel")
+
+@bot.command(name='s', help='Stops Music bot')
+async def stop(channel):
+    voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+    voice_client.stop()
+
 bot.run(TOKEN)
