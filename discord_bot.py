@@ -28,15 +28,15 @@ async def fucking_miguel(channel, number_of_times: int):
 @bot.command(name='p', help='Plays Music from the given url')
 async def play(channel, url: str):
 
-    channel_name = channel.message.author.voice.channel.name
+    channel = channel.message.author.voice.channel
     voice_channel = discord.utils.get(
-        channel.guild.voice_channels, name=channel_name)
+        channel.guild.voice_channels, name=channel.name)
     voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
 
     if voice_client == None:
         await voice_channel.connect()
     else:
-        await voice_client.move_to(channel_name)
+        await voice_client.move_to(channel)
 
 
 @bot.command(name='l', help='Stops Music bot')
