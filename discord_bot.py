@@ -1,6 +1,7 @@
 import os
 import discord
 from dotenv import load_dotenv
+from pytube import YouTube
 
 from discord.ext import commands
 load_dotenv()
@@ -35,8 +36,49 @@ async def play(channel, url: str):
 
     if voice_client == None:
         await voice_channel.connect()
+        voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
     else:
         await voice_client.move_to(channel)
+
+    try:
+        video = YouTube(url)
+
+        stream = video.streams.filter(only_audio=True)[0]
+
+        location = stream.download()
+        extension = location.split('.')[-1]
+
+        if os.path.exists(f'music_to_play.{extension}'):
+            os.remove(f'music_to_play.{extension}')
+
+        os.rename(location, f'music_to_play.{extension}')
+
+        if voice_client.is_playing():
+            voice_client.stop()
+
+        voice_client.play(discord.FFmpegPCMAudio(f'music_to_play.{extension}'))
+    except:
+        await channel.send('It is not working Manel')
+
+@bot.command(name='rick', help='Plays Rick Roll')
+async def play(channel):
+
+    channel = channel.message.author.voice.channel
+    voice_channel = discord.utils.get(
+        channel.guild.voice_channels, name=channel.name)
+    voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+
+    if voice_client == None:
+        await voice_channel.connect()
+        voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+    else:
+        await voice_client.move_to(channel)
+
+    if voice_client.is_playing():
+        voice_client.stop()
+
+    voice_client.play(discord.FFmpegPCMAudio("rick.mp4"))
+
 
 
 @bot.command(name='l', help='Stops Music bot')
