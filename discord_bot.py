@@ -2,6 +2,7 @@ import os
 import discord
 from dotenv import load_dotenv
 from pytube import YouTube
+import utils
 
 from discord.ext import commands
 load_dotenv()
@@ -29,35 +30,30 @@ async def fucking_miguel(channel, number_of_times: int):
 @bot.command(name='p', help='Plays Music from the given url')
 async def play(channel, url: str):
 
-    channel = channel.message.author.voice.channel
+    def next_song(voice_client):
+        utils.delete()
+        if utils.has_next_song():
+            voice_client.play(discord.FFmpegPCMAudio(utils.get()), after=lambda x: next_song(voice_client))
+
+    vc = channel.message.author.voice.channel
     voice_channel = discord.utils.get(
-        channel.guild.voice_channels, name=channel.name)
+        channel.guild.voice_channels, name=vc.name)
     voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
 
     if voice_client == None:
         await voice_channel.connect()
         voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
     else:
-        await voice_client.move_to(channel)
+        await voice_client.move_to(vc)
 
     try:
-        video = YouTube(url)
+        utils.add(url)
 
-        stream = video.streams.filter(only_audio=True)[0]
+        if not voice_client.is_playing():
+            voice_client.play(discord.FFmpegPCMAudio(utils.get()), after=lambda _: next_song(voice_client))
 
-        location = stream.download()
-        extension = location.split('.')[-1]
-
-        if os.path.exists(f'music_to_play.{extension}'):
-            os.remove(f'music_to_play.{extension}')
-
-        os.rename(location, f'music_to_play.{extension}')
-
-        if voice_client.is_playing():
-            voice_client.stop()
-
-        voice_client.play(discord.FFmpegPCMAudio(f'music_to_play.{extension}'))
-    except:
+    except Exception as e:
+        print(e)
         await channel.send('It is not working Manel')
 
 @bot.command(name='rick', help='Plays Rick Roll')
@@ -88,6 +84,10 @@ async def leave(channel):
         if voice_channel.guild == channel.guild:
             await voice_channel.disconnect()
 
+@bot.command(name='q', help='Shows Queue')
+async def queue(channel):
+    await channel.send(utils.get_queue())
+
 
 @bot.command(name='pa', help='Pauses Music bot')
 async def pause(channel):
@@ -110,6 +110,7 @@ async def resume(channel):
 async def stop(channel):
     voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
     voice_client.stop()
+    utils.clear()
 
 bot.run(TOKEN)
 print('Bot Started!')
