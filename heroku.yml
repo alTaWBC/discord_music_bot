@@ -1,8 +1,0 @@
-build:
-    docker:
-        web: Dockerfile
-        worker: .devcontainer/Dockerfile
-run:
-    worker:
-        command:
-            - python discord_bot.py
