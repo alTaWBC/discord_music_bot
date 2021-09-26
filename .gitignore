@@ -1,2 +1,7 @@
 music_to_play*
 .env
+*.mp3
+*.mp4
+*.wav
+
+!rick.mp4
