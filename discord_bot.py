@@ -112,5 +112,32 @@ async def stop(channel):
     voice_client.stop()
     utils.clear()
 
+@bot.command(name='sk', help='Skips Current Music')
+async def skip(channel):
+
+    def next_song(voice_client):
+        utils.delete()
+        if utils.has_next_song():
+            voice_client.play(discord.FFmpegPCMAudio(utils.get()), after=lambda x: next_song(voice_client))
+
+    vc = channel.message.author.voice.channel
+    voice_channel = discord.utils.get(
+        channel.guild.voice_channels, name=vc.name)
+    voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+
+    if voice_client == None:
+        await voice_channel.connect()
+        voice_client = discord.utils.get(bot.voice_clients, guild=channel.guild)
+    else:
+        await voice_client.move_to(vc)
+
+    try:
+        voice_client.stop()
+
+    except Exception as e:
+        print(e)
+        await channel.send('It is not working Manel')
+
+
 bot.run(TOKEN)
 print('Bot Started!')
