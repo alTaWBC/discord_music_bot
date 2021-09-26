@@ -8,9 +8,9 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
-RUN pip install -U python-dotenv
-RUN pip install -U discord.py
-RUN pip install PyNaCl pytube
+ADD ./requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
 RUN apt update && apt install ffmpeg -y
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 # COPY requirements.txt /tmp/pip-tmp/
