@@ -112,3 +112,4 @@ async def stop(channel):
     voice_client.stop()
 
 bot.run(TOKEN)
+print('Bot Started')
