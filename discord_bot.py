@@ -33,7 +33,10 @@ async def play(channel, *, url: str):
     def next_song(voice_client):
         utils.delete()
         if utils.has_next_song():
-            voice_client.play(discord.FFmpegPCMAudio(utils.get()), after=lambda x: next_song(voice_client))
+            ffmpeg_options = {
+                'options': f'-vn -ss {utils.get_ts()}'
+            }
+            voice_client.play(discord.FFmpegPCMAudio(utils.get(), **ffmpeg_options), after=lambda _: next_song(voice_client))
 
     vc = channel.message.author.voice.channel
     voice_channel = discord.utils.get(
@@ -50,7 +53,11 @@ async def play(channel, *, url: str):
         utils.add(url)
 
         if not voice_client.is_playing():
-            voice_client.play(discord.FFmpegPCMAudio(utils.get()), after=lambda _: next_song(voice_client))
+            ffmpeg_options = {
+                'options': f'-vn -ss {utils.get_ts()}'
+            }
+            print(ffmpeg_options)
+            voice_client.play(discord.FFmpegPCMAudio(utils.get(), **ffmpeg_options), after=lambda _: next_song(voice_client))
 
     except Exception as e:
         print(e)
@@ -114,11 +121,6 @@ async def stop(channel):
 
 @bot.command(name='sk', help='Skips Current Music')
 async def skip(channel):
-
-    def next_song(voice_client):
-        utils.delete()
-        if utils.has_next_song():
-            voice_client.play(discord.FFmpegPCMAudio(utils.get()), after=lambda x: next_song(voice_client))
 
     vc = channel.message.author.voice.channel
     voice_channel = discord.utils.get(

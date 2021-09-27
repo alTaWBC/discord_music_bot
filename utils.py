@@ -2,9 +2,10 @@ from youtube_search import YoutubeSearch
 from pytube import YouTube
 import os
 
-YOUTUBE_URL = "https://www.youtube.com"
+YOUTUBE_URL = "https://"
 
 music_queue = []
+ts = []
 playing = None
 
 def download(url: str):
@@ -20,11 +21,15 @@ def download(url: str):
 def add(url: str):
     location = download(url)
     music_queue.append(location)
+    ts.append(timestamp(url))
 
 def get():
     global playing
     playing = music_queue.pop()
     return playing
+
+def get_ts():
+    return ts.pop()
 
 
 def size():
@@ -50,7 +55,17 @@ def delete():
     os.remove(playing)
 
 def search(query):
-    print(query)
     results = YoutubeSearch(query, max_results=1).to_dict()
     url = results[0]['url_suffix']
     return f'https://www.youtube.com{url}'
+
+def timestamp(url):
+    if 't=' in url:
+        final = ""
+        for digit in url.split('t=')[-1]:
+            if digit.isdigit():
+                final += digit
+            else:
+                break
+        return int(final)
+    return 0
