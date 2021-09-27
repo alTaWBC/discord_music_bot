@@ -1,10 +1,17 @@
+from youtube_search import YoutubeSearch
 from pytube import YouTube
 import os
+
+YOUTUBE_URL = "https://www.youtube.com"
 
 music_queue = []
 playing = None
 
 def download(url: str):
+    
+    if not url.startswith(YOUTUBE_URL):
+        url = search(url)
+
     metadata = YouTube(url)
     # audio_location = metadata.streams.filter(only_audio=True).order_by('resolution').desc().first().download()
     audio_location = metadata.streams.filter(only_audio=True)[0].download()
@@ -27,10 +34,6 @@ def has_next_song():
     return len(music_queue) > 0
 
 def clear():
-    try:
-        delete()
-    except:
-        print(f'Failed to remove {playing}')
     for file_to_delete in music_queue:
         try:
             os.remove(file_to_delete)
@@ -46,3 +49,8 @@ def delete():
     print("Deleting", playing)
     os.remove(playing)
 
+def search(query):
+    print(query)
+    results = YoutubeSearch(query, max_results=1).to_dict()
+    url = results[0]['url_suffix']
+    return f'https://www.youtube.com{url}'

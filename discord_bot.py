@@ -28,7 +28,7 @@ async def fucking_miguel(channel, number_of_times: int):
 
 
 @bot.command(name='p', help='Plays Music from the given url')
-async def play(channel, url: str):
+async def play(channel, *, url: str):
 
     def next_song(voice_client):
         utils.delete()
