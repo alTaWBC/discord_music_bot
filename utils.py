@@ -14,7 +14,7 @@ def download(url: str):
 
     metadata = YouTube(url)
     # audio_location = metadata.streams.filter(only_audio=True).order_by('resolution').desc().first().download()
-    audio_location = metadata.streams.filter(only_audio=True)[0].download()
+    audio_location = metadata.streams.get_audio_only().download()
     return audio_location
 
 def add(url: str):

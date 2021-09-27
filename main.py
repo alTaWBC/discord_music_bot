@@ -17,6 +17,6 @@ for result in results:
 url = results[0]['url_suffix']
 video = YouTube(f'https://www.youtube.com{url}')
 
-stream = video.streams.filter(only_audio=True)[0]
+stream = video.streams.get_audio_only()
 
 location = stream.download()
